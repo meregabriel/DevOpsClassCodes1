@@ -1,49 +1,47 @@
 pipeline{
-            tools{
-                jdk 'myjava'
-                maven 'mymaven'
-            }
-            agent none
-            stages{
-                stage('Checkout'){
-                    agent any
-                    steps{
-                echo 'cloning...'
-                        git 'https://github.com/febfun1/DevOpsClassCodes1.git'
-                    }
-                }
-                stage('Compile'){
-                    agent {label 'slave1'}
-                    steps{
-                        echo 'compiling...'
-                        sh 'mvn compile'
-                }
-                }
-                stage('CodeReview'){
-                    agent {label 'slave1'}
-                    steps{
-                    
-                echo 'codeReview...'
-                        sh 'mvn pmd:pmd'
-                    }
-                }
-                stage('UnitTest'){
-                    agent {label 'slave2'}
-                    steps{
-                    echo 'Testing'
-                        sh 'mvn test'
-                    }
-                    post {
-                    success {
-                        junit 'target/surefire-reports/*.xml'
-                    }
-                }	
-                }
-                stage('Package'){
-                    agent any
-                    steps{
-                        sh 'mvn package'
-                    }
-                }
-            }
-        }
+
+   agent any
+
+	//create dockerhub credential in github with your dockerhub Username and Password/Token
+	environment {
+		DOCKERHUB_CREDENTIALS=credentials('dockerhub')
+	}
+	
+	stages {
+
+		stage('gitclone') {
+
+		      steps {
+		         git 'https://github.com/febfun1/DevOpsClassCodes1.git'
+		      }
+		}
+		
+		stage('Build') {
+			steps {
+			
+			   sh 'docker build -t febfun/class_app:${BUILD_NUMBER} .'
+			}
+		}
+		
+		stage('Login') {
+		
+			steps {
+			   sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login --username febfun --password-stdin'    
+			}
+		}
+
+		stage('Push') {
+			
+			steps {
+			   sh 'docker push febfun/class_app:${BUILD_NUMBER}'
+			}
+		}
+		}
+	
+	post {
+	    always {
+		sh 'docker logout'
+	    }
+    }
+
+}
