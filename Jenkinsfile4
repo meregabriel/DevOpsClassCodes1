@@ -12,7 +12,7 @@ pipeline{
 		stage('gitclone') {
 
 		      steps {
-		         git 'https://github.com/febfun1/Dec6Class.git'
+		         git 'https://github.com/febfun1/DevOpsClassCodes1.git'
 		      }
 		}
 		
