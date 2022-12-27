@@ -12,14 +12,14 @@ pipeline{
 		stage('gitclone') {
 
 		      steps {
-		         git 'https://github.com/febfun1/DevOpsClassCodes1.git'
+		         git 'https://github.com/febfun/DevOpsClassCodes1.git'
 		      }
 		}
 		
 		stage('Build') {
 			steps {
 			
-			   sh 'docker build -t febfun/class_app:${BUILD_NUMBER} .'
+			   sh 'docker build -t febfun/private:${BUILD_NUMBER} .'
 			}
 		}
 		
@@ -33,7 +33,7 @@ pipeline{
 		stage('Push') {
 			
 			steps {
-			   sh 'docker push febfun/class_app:${BUILD_NUMBER}'
+			   sh 'docker push febfun/private:${BUILD_NUMBER}'
 			}
 		}
 		}
